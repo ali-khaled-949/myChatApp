@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        #user-list {
+            width: 200px;
+            background: #f3f3f3;
+            overflow-y: auto;
+        }
+        #user-list ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        #user-list li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        #chat-window {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        #messages li {
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        #messages li .meta {
+            font-size: 0.9em;
+            color: #333;
+        }
+        #chat-form {
+            display: flex;
+            padding: 20px;
+            background: #f9f9f9;
+            border-top: 1px solid #ddd;
+        }
+        #chat-input {
+            flex: 1;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+        #chat-form button {
+            padding: 10px 20px;
+            border: none;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            outline: none;
+        }
+        #chat-form button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        #user-list {
+            width: 200px;
+            background: #f3f3f3;
+            overflow-y: auto;
+        }
+        #user-list ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        #user-list li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        #chat-window {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        #messages li {
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        #messages li .meta {
+            font-size: 0.9em;
+            color: #333;
+        }
+        #chat-form {
+            display: flex;
+            padding: 20px;
+            background: #f9f9f9;
+            border-top: 1px solid #ddd;
+        }
+        #chat-input {
+            flex: 1;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+        #chat-form button {
+            padding: 10px 20px;
+            border: none;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            outline: none;
+        }
+        #chat-form button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="user-list">
+            <ul>
+                <!-- User list will be dynamically populated here -->
+            </ul>
+        </div>
+        <div id="chat-window">
+            <ul id="messages"></ul>
+            <form id="chat-form">
+                <input id="chat-input" autocomplete="off" placeholder="Type a message..." />
+                <button>Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+
+        document.getElementById('chat-form').onsubmit = function(e) {
+            e.preventDefault(); // Prevents the form from submitting traditionally
+            var input = document.getElementById('chat-input');
+            if (input.value) {
+                socket.emit('chat message', input.value); // Emits the message to the server
+                input.value = '';
+            }
+            return false;
+        };
+        
+        // To test sending a message without user interaction, you could use:
+        socket.emit('chat message', 'Test message');
+        
+
+        socket.on('chat message', function(data) {
+            var item = document.createElement('li');
+            item.innerHTML = `<span class="meta">${new Date(data.timestamp).toLocaleTimeString()}</span>: ${data.text}`;
+            document.getElementById('messages').appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+
+        // Example of adding users to the user list
+        // You'd want to populate this dynamically based on connected users
+        socket.on('user list', function(users) {
+            var userList = document.getElementById('user-list').getElementsByTagName('ul')[0];
+            userList.innerHTML = '';
+            users.forEach(function(user) {
+                var item = document.createElement('li');
+                item.textContent = user;
+                userList.appendChild(item);
+            });
+        });
+    </script>
+</body>
+</html>
+
+<body>
+    <div class="container">
+        <div id="user-list">
+            <ul>
+                <!-- User list will
